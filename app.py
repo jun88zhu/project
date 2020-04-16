@@ -10,6 +10,7 @@ from functools import wraps
 
 import pymysql
 import secrets
+import os
 
 
 conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(secrets.dbuser, secrets.dbpass, secrets.dbhost, secrets.dbname)
@@ -114,7 +115,7 @@ ACCESS = {
 }
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'jzhu72_users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
