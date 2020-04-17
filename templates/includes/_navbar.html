@@ -34,18 +34,27 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/control_panel">Control Panel</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/for_admin_test">That is for admin</a>
+                </li>
+
                 {% endif %}
 
                 {% if current_user.is_admin() or current_user.is_user() %}
                 <li class="nav-item">
                     <a class="nav-link" href="/dashboard">Dashboard</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/for_user_test">That is for user</a>
+                </li>
                 {% endif %}
-
+                <li class="nav-item">
+                    <a class="nav-link" href="/for_guest_test">That is for guest</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/account">Account</a>
                 </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Logout</a>
                 </li>

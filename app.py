@@ -13,6 +13,13 @@ import secrets
 import os
 
 
+
+
+#dbuser=os.environ.get('DBUSER')
+#dbpass=os.environ.get('DBPASS')
+#dbhost=os.environ.get('DBHOST')
+#dbname=os.environ.get('DBNAME')
+#conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(dbuser, dbpass, dbhost, dbname)
 conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(secrets.dbuser, secrets.dbpass, secrets.dbhost, secrets.dbname)
 
 # Open database connection
@@ -256,6 +263,10 @@ def account():
 
     return render_template('account_detail.html', form=form, pageTitle='Your Account')
 
+@app.route('/for_guest_test')
+@requires_access_level(ACCESS['guest'])
+def for_guest_test():
+    return render_template('guest_page.html', pageTitle='That is for guest')
 
 
 ################ USER ACCESS FUNCTIONALITY OR GREATER ###################
@@ -266,6 +277,11 @@ def account():
 def dashboard():
     return render_template('dashboard.html', pageTitle='My Flask App Dashboard')
 
+@app.route('/for_user_test')
+@requires_access_level(ACCESS['user'])
+def for_user_test():
+    return render_template('user_page.html', pageTitle='That is for user')
+
 
 ################ ADMIN ACCESS FUNCTIONALITY ###################
 
@@ -275,6 +291,11 @@ def dashboard():
 def control_panel():
     all_users = User.query.all()
     return render_template('control_panel.html', users=all_users, pageTitle='My Flask App Control Panel')
+
+@app.route('/for_admin_test')
+@requires_access_level(ACCESS['admin'])
+def for_admin_test():
+    return render_template('admin_page.html', pageTitle='That is for admin')
 
 # user details & update
 @app.route('/user_detail/<int:user_id>', methods=['GET','POST'])
