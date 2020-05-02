@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h3>{{legend}}</h3>
+<form class="form-inline my-2 my-lg-0" method="POST">
+    <input class="form-control mr-sm-2" type="search" name="search_string" autofocus placeholder="Search" aria-label="Search">
+    <button class="text-white bg-dark" formaction="/search" type="submit">Search</button>
+  </form>
+  <br>
+    <button type="button" class="btn btn-dark">
+      <a class="text-white bg-dark" href="{{url_for('.report')}}">Add New Report</a></button>
+    <button type="button" class="btn btn-dark">
+        <a class="text-white bg-dark" href="{{url_for('.database)}}">Back to Database</a></button>
+
+{% if reporttable %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+          <th scope="col">HawkID</th>
+          <th scope="col">First_name</th>
+          <th scope="col">Last_name</th>
+          <th scope="col">TemperatureC</th>
+          <th scope="col">FeelingGood</th>
+          <th scope="col">NeedHelp</th>
+          <th scope="col">TodayClass</th>
+          <th scope="col">ConnectPositivePeople</th>
+          <th scope="col">ReportDate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in reporttable %}
+        <tr>
+          <td> {{row.HawkID}}</td>
+          <td> {{row.First_name}} </td>
+          <td> {{row.Last_name}} </td>
+          <td> {{row.TemperatureC}} </td>
+          <td> {{row.FeelingGood}} </td>
+          <td> {{row.NeedHelp}} </td>
+          <td> {{row.TodayClass}} </td>
+          <td> {{row.ConnectPositivePeople}} </td>
+          <td> {{row.ReportDate}}</td>
+          <td>
+              <form action="{{ url_for('get_report', InstanceID=row.InstanceID) }}" method="POST">
+                  <button type="submit" class="btn btn-dark">Details</button>
+              </form>
+          </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

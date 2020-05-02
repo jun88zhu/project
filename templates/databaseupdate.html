@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block body %}
+<div>
+    <h3>{{legend}}</h3>
+    <br>
+    <button type="button" class="btn btn-dark">
+        <a class="text-white bg-dark" href="{{url_for('.database')}}">Back to Database</a></button>
+    <form method='POST' action="">
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                  <th scope="col">InstanceID</th>
+                  <th scope="col">HawkID</th>
+                  <th scope="col">First_name</th>
+                  <th scope="col">Last_name</th>
+                  <th scope="col">TemperatureC</th>
+                  <th scope="col">FeelingGood</th>
+                  <th scope="col">NeedHelp</th>
+                  <th scope="col">TodayClass</th>
+                  <th scope="col">ConnectPositivePeople</th>
+                  <th scope="col">ReportDate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {{ form.csrf_token }}
+                    <td>{{form.InstanceID(size=5, readonly=true)}}</td>
+                    <td>{{form.HawkID(size=20)}}</td>
+                    <td>{{form.First_name(size=20)}} </td>
+                    <td>{{form.Last_name(size=20)}} </td>
+                    <td>{{form.TemperatureC(size=20)}} </td>
+                    <td>{{form.FeelingGood(size=20)}} </td>
+                    <td>{{form.NeedHelp(size=20)}} </td>
+                    <td>{{form.TodayClass(size=20)}} </td>
+                    <td>{{form.ConnectPositivePeople(size=20)}} </td>
+                    <td>{{form.ReportDate(size=20)}}</td>
+                </tr>
+            </tbody>
+            </table>
+        <input type="submit" value="Save">
+
+    </form>
+
+
+</div>
+{% endblock %}

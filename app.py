@@ -1,32 +1,32 @@
 from flask import Flask, render_template, flash, redirect, url_for, request
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, IntegerField, PasswordField, BooleanField, SubmitField,DecimalField,DateField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_sqlalchemy import SQLAlchemy as _BaseSQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.urls import url_parse
 from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from functools import wraps
-
+from sqlalchemy import or_
 import pymysql
-#import secrets
+import secrets
 import os
 
 
 
 
-dbuser=os.environ.get('DBUSER')
-dbpass=os.environ.get('DBPASS')
-dbhost=os.environ.get('DBHOST')
-dbname=os.environ.get('DBNAME')
-conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(dbuser, dbpass, dbhost, dbname)
-#conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(secrets.dbuser, secrets.dbpass, secrets.dbhost, secrets.dbname)
+#dbuser=os.environ.get('DBUSER')
+#dbpass=os.environ.get('DBPASS')
+#dbhost=os.environ.get('DBHOST')
+#dbname=os.environ.get('DBNAME')
+#conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(dbuser, dbpass, dbhost, dbname)
+conn = "mysql+pymysql://{0}:{1}@{2}/{3}".format(secrets.dbuser, secrets.dbpass, secrets.dbhost, secrets.dbname)
 
-# Open database connection
-#dbhost = secrets.dbhost
-#dbuser = secrets.dbuser
-#dbpass = secrets.dbpass
-#dbname = secrets.dbname
+ #Open database connection
+dbhost = secrets.dbhost
+dbuser = secrets.dbuser
+dbpass = secrets.dbpass
+dbname = secrets.dbname
 
 #db = pymysql.connect(dbhost, dbuser, dbpass, dbname)
 
@@ -38,7 +38,9 @@ login.login_message_category = 'danger' # sets flash category for the default me
 
 
 app.config['SECRET_KEY']='SuperSecretKey'
-# import os
+app.config['SQLALCHEMY_DATABASE_URI'] = conn
+db=_BaseSQLAlchemy(app)
+#import os
 # = os.environ.get('SECRET_KEY')
 
 
@@ -48,6 +50,141 @@ class SQLAlchemy(_BaseSQLAlchemy):
         super(SQLAlchemy, self).apply_pool_defaults(app, options)
         options["pool_pre_ping"] = True
 # <-- MWC
+
+
+class jzhu72_project(db.Model):
+    InstanceID= db.Column(db.Integer,primary_key=True)
+    HawkID=db.Column(db.Integer)
+    First_name=db.Column(db.String(50))
+    Last_name=db.Column(db.String(50))
+    TemperatureC=db.Column(db.DECIMAL(5,2))
+    FeelingGood=db.Column(db.String(50))
+    NeedHelp=db.Column(db.String(50))
+    TodayClass=db.Column(db.String(50))
+    ConnectPositivePeople=db.Column(db.String(50))
+    ReportDate=db.Column(db.Date)
+
+class report(FlaskForm):
+    InstanceID=IntegerField('InstanceID:')
+    HawkID=StringField('HawkID:',validators=[DataRequired()])
+    First_name=StringField('First_name:',validators=[DataRequired()])
+    Last_name=StringField('Last_name:',validators=[DataRequired()])
+    TemperatureC=DecimalField('TemperatureC:',validators=[DataRequired()])
+    FeelingGood=StringField('FeelingGood:',validators=[DataRequired()])
+    NeedHelp=StringField('NeedHelp:',validators=[DataRequired()])
+    TodayClass=StringField('TodayClass:',validators=[DataRequired()])
+    ConnectPositivePeople=StringField('ConnectPositivePeople:',validators=[DataRequired()])
+    ReportDate=DateField('ReportDate:',validators=[DataRequired()])
+
+@app.route('/view')
+def view():
+    all_reports=jzhu72_project.query.all()
+    return render_template('view.html',reporttable=all_reports,pageTitle='University of Iowa Daily Reprot',legend="View")
+
+@app.route('/database')
+def database():
+    all_reports=jzhu72_project.query.all()
+    return render_template('database.html',reporttable=all_reports,pageTitle='University of Iowa Daily Reprot',legend="View")
+
+@app.route('/reports/<int:InstanceID>',methods=['GET','POST'])
+def get_report(InstanceID):
+    reports=jzhu72_project.query.get_or_404(InstanceID)
+    return render_template('databasedetail.html',form=reports,pageTitle="Reports details", legend='Reports Details')
+
+@app.route('/delete_report/<int:InstanceID>',methods=['GET','POST'])
+def delete_report(InstanceID):
+    if request.method=='POST':
+        report=jzhu72_project.query.get_or_404(InstanceID)
+        db.session.delete(report)
+        db.session.commit()
+        return redirect('/database')
+    else:
+        return redirect('/database')
+
+@app.route('/reports/<int:InstanceID>/update',methods=['GET','POST'])
+def update_report(InstanceID):
+    reports=jzhu72_project.query.get_or_404(InstanceID)
+    form=report()
+
+    if form.validate_on_submit():
+        reports.HawkID=form.HawkID.data
+        reports.First_name=form.First_name.data
+        reports.Last_name=form.Last_name.data
+        reports.TemperatureC=form.TemperatureC.data
+        reports.FeelingGood=form.FeelingGood.data
+        reports.NeedHelp=form.NeedHelp.data
+        reports.TodayClass=form.TodayClass.data
+        reports.ConnectPositivePeople=form.ConnectPositivePeople.data
+        reports.ReportDate=form.ReportDate.data
+        db.session.commit()
+        return redirect(url_for('get_report',InstanceID=reports.InstanceID))
+    form.InstanceID.data=reports.InstanceID
+    form.HawkID.data=reports.HawkID
+    form.First_name.data=reports.First_name
+    form.Last_name.data=reports.Last_name
+    form.TemperatureC.data=reports.TemperatureC
+    form.FeelingGood.data=reports.FeelingGood
+    form.NeedHelp.data=reports.NeedHelp
+    form.TodayClass.data=reports.TodayClass
+    form.ConnectPositivePeople.data=reports.ConnectPositivePeople
+    form.ReportDate.data=reports.ReportDate
+    return render_template('database.html',form=form,pageTitle='Update Report',legend='Update a Report')
+
+@app.route('/search',methods=['GET','POST'])
+def search():
+        if request.method=="POST":
+            form=request.form
+            search_value=form['search_string']
+            search="%{}%".format(search_value)
+            results=jzhu72_project.query.filter(or_(jzhu72_project.First_name.like(search),
+                                                          jzhu72_project.Last_name.like(search),
+                                                          jzhu72_project.TemperatureC.like(search),
+                                                          jzhu72_project.HawkID.like(search),
+                                                          jzhu72_project.FeelingGood.like(search),
+                                                          jzhu72_project.NeedHelp.like(search),
+                                                          jzhu72_project.TodayClass.like(search),
+                                                          jzhu72_project.ConnectPositivePeople.like(search),
+                                                          jzhu72_project.ReportDate.like(search))).all()
+            return render_template('database.html',reporttable=results,pageTitle="University of Iowa Daily Report",legend="Search results")
+        else:
+            return redirect('/')
+
+
+
+@app.route('/search_view',methods=['GET','POST'])
+def search_view():
+        if request.method=="POST":
+            form=request.form
+            search_value=form['search_string']
+            search="%{}%".format(search_value)
+            results=jzhu72_project.query.filter(or_(jzhu72_project.First_name.like(search),
+                                                          jzhu72_project.Last_name.like(search),
+                                                          jzhu72_project.TemperatureC.like(search),
+                                                          jzhu72_project.HawkID.like(search),
+                                                          jzhu72_project.FeelingGood.like(search),
+                                                          jzhu72_project.NeedHelp.like(search),
+                                                          jzhu72_project.TodayClass.like(search),
+                                                          jzhu72_project.ConnectPositivePeople.like(search),
+                                                          jzhu72_project.ReportDate.like(search))).all()
+            return render_template('view.html',reporttable=results,pageTitle="University of Iowa Daily Report",legend="Search results")
+        else:
+            return redirect('/')
+
+@app.route('/addreport',methods=['GET','POST'])
+def report():
+    form=report()
+    if form.validate_on_submit():
+        report=jzhu72_project(HawkID=form.HawkID.data,First_name=form.First_name.data,Last_name=form.Last_name.data,TemperatureC=form.TemperatureC.data,
+        FeelingGood=form.FeelingGood.data,NeedHelp=form.NeedHelp.data,TodayClass=form.TodayClass.data,ConnectPositivePeople=form.ConnectPositivePeople.data,ReportDate=form.ReportDate.data)
+        db.session.add(report)
+        db.session.commit()
+        return redirect('/database')
+    return render_template('addreport.html',form=form,pageTitle='Add reports')
+
+
+
+
+
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = conn

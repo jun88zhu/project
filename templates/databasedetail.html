@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block body %}
+<div>
+    <br>
+    <button type="button" class="btn btn-dark">
+        <a class="text-white bg-dark" href="{{url_for('.database')}}">Back to Database</a></button>
+    <br>
+    {% if form %}
+    <form method='POST' action="">
+        {{ form.csrf_token }}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">HawkID</th>
+                  <th scope="col">First_name</th>
+                  <th scope="col">Last_name</th>
+                  <th scope="col">TemperatureC</th>
+                  <th scope="col">FeelingGood</th>
+                  <th scope="col">NeedHelp</th>
+                  <th scope="col">TodayClass</th>
+                  <th scope="col">ConnectPositivePeople</th>
+                  <th scope="col">ReportDate</th>
+            </thead>
+            <tbody>
+                <tr>
+                  <td>{{form.ID}}</td>
+                  <td>{{form.HawkID}}</td>
+                  <td>{{form.First_name}} </td>
+                  <td>{{form.Last_name}} </td>
+                  <td>{{form.TemperatureC}} </td>
+                  <td>{{form.FeelingGood}} </td>
+                  <td>{{form.NeedHelp}} </td>
+                  <td>{{form.TodayClass}} </td>
+                  <td>{{form.ConnectPositivePeople}} </td>
+                  <td>{{form.ReportDate}}</td>
+                  <td> <button type="submit" class="btn btn-dark" formaction="{{url_for('update_report',ID=form.ID)}}" value="Update">Update</button>
+                  </td>
+                  <td><button type="submit" class="btn btn-dark" formaction="{{url_for('delete_report',ID=form.ID)}}" value="Delete">Delete</button>
+                  </td>
+
+                </tr>
+            </tbody>
+            </table>
+
+
+    </form>
+    {% endif %}
+
+
+
+
+</div>
+{% endblock %}

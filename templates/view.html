@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h3>{{legend}}</h3>
+<form class="form-inline my-2 my-lg-0" method="POST">
+    <input class="form-control mr-sm-2" type="search" name="search_string" autofocus placeholder="Search" aria-label="Search">
+    <button class="text-white bg-dark" formaction="/search_overview" type="submit">Search</button>
+  </form>
+  <br>
+    <button type="button" class="btn btn-dark">
+        <a class="text-white bg-dark" href="{{url_for('.view')}}">Back to Database</a></button>
+
+{% if reporttable %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+          <th scope="col">HawkID</th>
+          <th scope="col">First_name</th>
+          <th scope="col">Last_name</th>
+          <th scope="col">TemperatureC</th>
+          <th scope="col">FeelingGood</th>
+          <th scope="col">NeedHelp</th>
+          <th scope="col">TodayClass</th>
+          <th scope="col">ConnectPositivePeople</th>
+          <th scope="col">ReportDate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in reporttable %}
+        <tr>
+          <td>{{form.HawkID}}</td>
+          <td>{{form.First_name}} </td>
+          <td>{{form.Last_name}} </td>
+          <td>{{form.TemperatureC}} </td>
+          <td>{{form.FeelingGood}} </td>
+          <td>{{form.NeedHelp}} </td>
+          <td>{{form.TodayClass}} </td>
+          <td>{{form.ConnectPositivePeople}} </td>
+          <td>{{form.ReportDate}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}
